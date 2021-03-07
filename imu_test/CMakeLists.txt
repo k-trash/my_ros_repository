@@ -150,9 +150,9 @@ add_executable(cpp_serial_test src/cpp_serial_test.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-#target_link_libraries($cpp_serial_test
-#  ${catkin_LIBRARIES}
-#)
+target_link_libraries(cpp_serial_test
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

@@ -1,57 +1,67 @@
-//Ver1.0.0 2020/03/05 k-trash
+//Ver1.1.0 2020/03/07 k-trash
+//change to ros node
 
-//#include <ros/ros.h>
+#include "ros/ros.h"
+#include "sensor_msgs/Imu.h"
+
 #include <iostream>
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
-#include <thread>
-#include <chrono>
 
 int openSerial(const char *devise_name_);
 
 int main(int argc, char *argv[]){
-	//ros::init(argc, argv, "cpp_serial_test");
-	//ros::NodeHandle nh;
+	ros::init(argc, argv, "cpp_serial_test");
+	ros::NodeHandle nh;
 
 	int ret_dev = 0;
 	int rec_write = 0;
 	int recv_size = 0;
-	int state = 0;
-	int next_index = 0;
 	char cap_write[1] = {'0'};
 	char device_name[] = "/dev/ttyACM0";
-	static unsigned char buffer_data[256] = {0};
-	static int buffer_size = 0;
 	unsigned char recv_data[256] = {0};
+
+	sensor_msgs::Imu imu;
+	
+	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu_data", 10);
 
 	ret_dev = openSerial(device_name);
 
 	if(ret_dev<0){
 		std::cout << "Couldn't open" << std::endl;
-		return 1;
+		ros::shutdown();
 	}
 
-	while(true){
+	ros::Rate loop_rate(10);
+	while(ros::ok()){
 		rec_write = write(ret_dev, cap_write, 1);
 
 		if(rec_write == 0){
 			std::cout << "Couldn't write" << std::endl;
-			return 1;
+			ros::shutdown();
 		}
 		std::cout << "Wrote\t";
 		recv_size = read(ret_dev, recv_data, sizeof(recv_data));
 		if(recv_size > 0){
 			if(recv_size == 18){
-				for(int i=0;i<9;i++){
-					std::cout << int16_t(recv_data[i<<1]<<8 | recv_data[(i<<1)+1]) << '\t';
-				}
+				imu.header.frame_id = "imu_link";
+				imu.header.stamp = ros::Time::now();
+				imu.linear_acceleration.x = int16_t(recv_data[0]<<8 | recv_data[1]);
+				imu.linear_acceleration.y = int16_t(recv_data[2]<<8 | recv_data[3]);
+				imu.linear_acceleration.z = int16_t(recv_data[4]<<8 | recv_data[5]);
+				imu.angular_velocity.x = int16_t(recv_data[6]<<8 | recv_data[7]);
+				imu.angular_velocity.y = int16_t(recv_data[8]<<8 | recv_data[9]);
+				imu.angular_velocity.z = int16_t(recv_data[10]<<8 | recv_data[11]);
 				std::cout << std::endl;
 			}else{
 				std::cout << "Read fail" << std::endl;
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		imu_pub.publish(imu);
+
+		ros::spinOnce();
+		loop_rate.sleep();
 	}
 
 	return 0;

@@ -42,8 +42,8 @@ int main(int argc, char *argv[]){
 		std::cout << "Wrote\t";
 		recv_size = read(ret_dev, recv_data, sizeof(recv_data));
 		if(recv_size > 0){
-			if(recv_size == 12){
-				for(int i=0;i<6;i++){
+			if(recv_size == 18){
+				for(int i=0;i<9;i++){
 					std::cout << int16_t(recv_data[i<<1]<<8 | recv_data[(i<<1)+1]) << '\t';
 				}
 				std::cout << std::endl;

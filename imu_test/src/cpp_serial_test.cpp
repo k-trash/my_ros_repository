@@ -41,7 +41,6 @@ int main(int argc, char *argv[]){
 			std::cout << "Couldn't write" << std::endl;
 			ros::shutdown();
 		}
-		std::cout << "Wrote\t";
 		recv_size = read(ret_dev, recv_data, sizeof(recv_data));
 		if(recv_size > 0){
 			if(recv_size == 18){

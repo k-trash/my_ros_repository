@@ -1,5 +1,5 @@
 //Ver1.1.1 2020/03/07 k-trash
-//add magnet publish
+//change magnet publish
 
 #include "ros/ros.h"
 #include "sensor_msgs/Imu.h"
@@ -11,6 +11,7 @@
 #include <termios.h>
 
 //#define OFFSET
+//#define MAGNET
 
 int openSerial(const char *devise_name_);
 
@@ -32,7 +33,10 @@ int main(int argc, char *argv[]){
 	sensor_msgs::MagneticField mag;
 
 	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
-	ros::Publisher mag_pub = nh.advertise<sensor_msgs::MagneticField>("imu/mag", 10);
+
+	#ifdef MAGNET
+		ros::Publisher mag_pub = nh.advertise<sensor_msgs::MagneticField>("imu/mag", 10);
+	#endif
 
 	ret_dev = openSerial(device_name);
 
@@ -61,12 +65,14 @@ int main(int argc, char *argv[]){
 				imu.angular_velocity.y = int16_t(recv_data[8]<<8 | recv_data[9]) - 40;
 				imu.angular_velocity.z = int16_t(recv_data[10]<<8 | recv_data[11]) - 25;
 				
-				mag.header.frame_id = "imu_link";
-				mag.header.stamp = ros::Time::now();
-				mag.magnetic_field.x = int16_t(recv_data[12]<<8 | recv_data[13]) + 200;
-				mag.magnetic_field.y = int16_t(recv_data[14]<<8 | recv_data[15]) + 100;
-				mag.magnetic_field.z = int16_t(recv_data[16]<<8 | recv_data[17]);
-				
+				#ifdef MAGNET
+					mag.header.frame_id = "imu_link";
+					mag.header.stamp = ros::Time::now();
+					mag.magnetic_field.x = int16_t(recv_data[12]<<8 | recv_data[13]) + 200;
+					mag.magnetic_field.y = int16_t(recv_data[14]<<8 | recv_data[15]) + 100;
+					mag.magnetic_field.z = int16_t(recv_data[16]<<8 | recv_data[17]);
+				#endif
+
 				#ifdef OFFSET
 					if(max[0] < mag.magnetic_field.x)	max[0] = mag.magnetic_field.x;
 					if(min[0] > mag.magnetic_field.x)	min[0] = mag.magnetic_field.x;
@@ -85,7 +91,10 @@ int main(int argc, char *argv[]){
 			}
 		}
 		imu_pub.publish(imu);
-		mag_pub.publish(mag);
+		
+		#ifdef MAGNET
+			mag_pub.publish(mag);
+		#endif
 
 		ros::spinOnce();
 		loop_rate.sleep();

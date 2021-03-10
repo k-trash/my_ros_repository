@@ -6,12 +6,20 @@
 #include "sensor_msgs/MagneticField.h"
 
 #include <iostream>
+#include <cmath>
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
 
+#define GYRO_OFFSET
 //#define OFFSET
-//#define MAGNET
+#define MAGNET
+
+#ifndef M_PI
+	#define M_PI 3.14159265358979
+#endif
+
+#define DEG_TO_RAD(deg) (((deg)/360)*2*M_PI)
 
 int openSerial(const char *devise_name_);
 
@@ -61,10 +69,14 @@ int main(int argc, char *argv[]){
 				imu.linear_acceleration.x = int16_t(recv_data[0]<<8 | recv_data[1]);
 				imu.linear_acceleration.y = int16_t(recv_data[2]<<8 | recv_data[3]);
 				imu.linear_acceleration.z = int16_t(recv_data[4]<<8 | recv_data[5]);
-				imu.angular_velocity.x = int16_t(recv_data[6]<<8 | recv_data[7]) + 40;
-				imu.angular_velocity.y = int16_t(recv_data[8]<<8 | recv_data[9]) - 40;
-				imu.angular_velocity.z = int16_t(recv_data[10]<<8 | recv_data[11]) - 25;
+				imu.angular_velocity.x = DEG_TO_RAD((-int16_t(recv_data[6]<<8 | recv_data[7])*500.0f)/float(0x8000) - 0.6);
+				imu.angular_velocity.y = DEG_TO_RAD((-int16_t(recv_data[8]<<8 | recv_data[9])*500.0f)/float(0x8000) + 0.6);
+				imu.angular_velocity.z = DEG_TO_RAD((-int16_t(recv_data[10]<<8 | recv_data[11])*500.0f)/float(0x8000) + 0.4);
 				
+				#ifdef GYRO_OFFSET
+					std::cout << imu.angular_velocity.x << '\t' << imu.angular_velocity.y << '\t' << imu.angular_velocity.z << std::endl;
+				#endif
+
 				#ifdef MAGNET
 					mag.header.frame_id = "imu_link";
 					mag.header.stamp = ros::Time::now();

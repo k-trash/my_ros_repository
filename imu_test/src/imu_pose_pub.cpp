@@ -6,6 +6,8 @@
 #include <tf/transform_broadcaster.h>
 #include <sensor_msgs/Imu.h>
 
+#include <cmath>
+
 void imuCallback(const sensor_msgs::Imu& imu_msg_);
 void convertRpyQuat(double roll_, double pictch_, double yaw_);
 

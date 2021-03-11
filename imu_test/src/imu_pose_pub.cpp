@@ -9,9 +9,9 @@
 #include <cmath>
 
 void imuCallback(const sensor_msgs::Imu& imu_msg_);
-void convertRpyQuat(double roll_, double pictch_, double yaw_);
+void convertRpyQuat(double roll_, double pitch_, double yaw_);
 
-geometry_msgs::Quarternion marker_quat;
+geometry_msgs::Quaternion marker_quat;
 
 int main(int argc, char *argv[]){
 	ros::init(argc, argv, "imu_pose_pub");
@@ -69,10 +69,10 @@ void imuCallback(const sensor_msgs::Imu& imu_msg_){
 	roll = atan(acc_y/acc_z);
 	pitch = atan(-acc_x/sqrt(acc_y*acc_y+acc_z*acc_z));
 
-	convert_Rpy_Quat(roll, pitch, yaw);
+	convertRpyQuat(roll, pitch, yaw);
 }
 
-void convertRpyQuat(double roll_, double pictch_, double yaw_){
-	tf::Quaternion quat = tf::createQuarternionFromRPY(roll_, pitch_, yaw_);
-	quarternionTFTOMsg(quat, marker_quat;
+void convertRpyQuat(double roll_, double pitch_, double yaw_){
+	tf::Quaternion quat = tf::createQuaternionFromRPY(roll_, pitch_, yaw_);
+	quaternionTFToMsg(quat, marker_quat);
 }

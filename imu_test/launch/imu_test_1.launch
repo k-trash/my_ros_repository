@@ -1,0 +1,4 @@
+<launch>
+	<node name="cpp_serial_test" pkg="imu_test" type="cpp_serial_test" />
+	<node name="imu_pose_pub" pkg="imu_test" type="imu_pose_pub" />
+</launch>

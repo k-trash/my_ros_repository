@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
 		ros::shutdown();
 	}
 
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(100);
 	while(ros::ok()){
 		rec_write = write(ret_dev, cap_write, 1);
 

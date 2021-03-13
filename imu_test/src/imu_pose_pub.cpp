@@ -1,5 +1,5 @@
-//Ver1.1.0 2020/03/12 k-trash
-//Add gyro
+//Ver1.1.1 2020/03/12 k-trash
+//Change to trapezoidal approximation
 
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
@@ -63,6 +63,7 @@ void imuCallback(const sensor_msgs::Imu& imu_msg_){
 	static double pre_time = ros::Time::now().toSec();
 
 	static double roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
+	static double pre_x = 0.0f, pre_y = 0.0f, pre_z = 0.0f;
 
 	double d_time;
 	double gyr_x, gyr_y, gyr_z;
@@ -71,9 +72,9 @@ void imuCallback(const sensor_msgs::Imu& imu_msg_){
 	d_time = imu_msg_.header.stamp.toSec() - pre_time;
 	pre_time = imu_msg_.header.stamp.toSec();
 
-	gyr_x = imu_msg_.angular_velocity.x * d_time;
-	gyr_y = imu_msg_.angular_velocity.y * d_time;
-	gyr_z = -1*imu_msg_.angular_velocity.z * d_time;
+	gyr_x = (pre_x + imu_msg_.angular_velocity.x) / 2.0f * d_time;
+	gyr_y = (pre_y + imu_msg_.angular_velocity.y) / 2.0f * d_time;
+	gyr_z = -1*(pre_z+imu_msg_.angular_velocity.z)/ 2.0f * d_time;
 
 	d_roll = gyr_x + gyr_y*sin(roll)*tan(pitch) + gyr_z*cos(roll)*tan(pitch);
 	d_pitch = gyr_y*cos(roll) - gyr_z*sin(roll);
@@ -83,10 +84,13 @@ void imuCallback(const sensor_msgs::Imu& imu_msg_){
 	pitch += d_pitch;
 	yaw += d_yaw;
 
+	pre_x = imu_msg_.angular_velocity.x;
+	pre_y = imu_msg_.angular_velocity.y;
+	pre_z = imu_msg_.angular_velocity.z;
+
 	double acc_x = imu_msg_.linear_acceleration.x;
 	double acc_y = imu_msg_.linear_acceleration.y;
 	double acc_z = imu_msg_.linear_acceleration.z;
-
 
 	roll = roll*0.95 - 0.05*atan(acc_y/acc_z);
 	pitch = pitch*0.95 - 0.05*atan(-acc_x/sqrt(acc_y*acc_y+acc_z*acc_z));

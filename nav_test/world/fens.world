@@ -1,40 +1,20 @@
 <?xml version="1.0"?>
 <sdf version="1.5" xmlns:xacro="https://ros.org/wiki.xacro">
-	<xacro:macro name="fens_vert" param="x y1 y2">
-		<pose frame=''>${x} ${{${y2}-${y1}}/2} 0.075 0 0 0</pose>
+	<xacro:macro name="fens" param="x1 x2 y1 y2">
+		<pose frame=''>${{${x1}+${y1}}/2} ${{${y2}+${y1}}/2} 0.075 0 0 ${atan{{${y1}-${y2}}/{${x1}-${x2}}}}</pose>
 		<link name='link'>
 			<collison name='collision'>
 				<geometry>
 					<box>
-						<size>0.024 ${${y2}-${y1}} 0.15</size>
+						<size>0.024 ${sqrt{ ${${y1}-${y2}}*${${y1}-${y2}} + ${${x1}-${x2}}*${${x1}^${x2}} }} 0.15</size>
 					</box>
 				</geometry>
 			</collision>
 			<visual name='visual'>
 				<geometry>
 					<box>
-						<size>0.024 ${${y2}-${y2}} 0.15</size>
+						<size>0.024 ${sqrt{ ${${y1}-${y2}}*${${y1}-${y2}} + ${${x1}-${x2}}*${${x1}^${x2}} }} 0.15</size>
 					</size>
-				</geometry>
-			</visual>
-		</link>
-	</xacro:macro>
-
-	<xacro:xacro name="fens_horiz" param="x1 x2 y">
-		<pose frame=''>${{${x2}-${x1}}/2} ${y} 0.075 0 0 0</pose>
-		<link name='link'>
-			<collision name='collision'>
-				<geometry>
-					<box>
-						<size>${${x2}-${x1}} 0.024 0.15</size>
-					</box>
-				</geometry>
-			</collision>
-			<visual name='visual'>
-				<geometry>
-					<box>
-						<size>${${x2}-${x1}} 0.024 0.15</size>
-					</box>
 				</geometry>
 			</visual>
 		</link>

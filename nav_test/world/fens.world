@@ -1,22 +1,25 @@
 <?xml version="1.0"?>
 <sdf version="1.5" xmlns:xacro="https://ros.org/wiki.xacro">
-	<xacro:macro name="fens" param="x1 x2 y1 y2">
-		<pose frame=''>${{${x1}+${y1}}/2} ${{${y2}+${y1}}/2} 0.075 0 0 ${atan{{${y1}-${y2}}/{${x1}-${x2}}}}</pose>
-		<link name='link'>
-			<collison name='collision'>
-				<geometry>
-					<box>
-						<size>0.024 ${sqrt{ ${${y1}-${y2}}*${${y1}-${y2}} + ${${x1}-${x2}}*${${x1}^${x2}} }} 0.15</size>
-					</box>
-				</geometry>
-			</collision>
-			<visual name='visual'>
-				<geometry>
-					<box>
-						<size>0.024 ${sqrt{ ${${y1}-${y2}}*${${y1}-${y2}} + ${${x1}-${x2}}*${${x1}^${x2}} }} 0.15</size>
-					</size>
-				</geometry>
-			</visual>
-		</link>
+	<xacro:macro name="fens" params="prefix x1 x2 y1 y2">
+		<model name="${prefix}">
+			<pose frame=''>${{${x1}+${y1}}/2} ${{${y2}+${y1}}/2} 0.075 0 0 ${atan{{${y1}-${y2}}/{${x1}-${x2}}}}</pose>
+			<static>true</static>
+			<link name='link'>
+				<collison name='collision'>
+					<geometry>
+						<box>
+							<size>0.024 ${sqrt{ ${${y1}-${y2}}*${${y1}-${y2}} + ${${x1}-${x2}}*${${x1}^${x2}} }} 0.15</size>
+						</box>
+					</geometry>
+				</collision>
+				<visual name='visual'>
+					<geometry>
+						<box>
+							<size>0.024 ${sqrt{ ${${y1}-${y2}}*${${y1}-${y2}} + ${${x1}-${x2}}*${${x1}^${x2}} }} 0.15</size>
+						</box>
+					</geometry>
+				</visual>
+			</link>
+		</model>
 	</xacro:macro>
 </sdf>

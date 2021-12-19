@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<sdf version="1.5">
+<sdf version="1.5" xmlns:xacro="https://ros.org/wiki/xacro">
 	<world name="default">
 		<include>
 			<uri>model://sun</uri>
@@ -8,19 +8,9 @@
 			<uri>model://ground_plane</uri>
 		</include>
 
-		<model name='fens_0'>
-			<pose frame=''>-0.012 50 0.075 0 0 0</pose>
-			<static>true</static>
-			<link name='link'>
-				<collision name='collision'>
-					<geometry>
-						<box>
-							<size>0.024 100 0.15</size>
-						</box>
-					</geometry>
-				</collision>
-				<visual name='visual'>
-					<geometry>
+		<xacro:include filename="$(find nav_test)/world/fens.world" />
+
+		<xacro:fens prefix="fens_0" x_1="0" x_2="0" y_1="0" y_2="2" />
 
 		<model name="box_0">
 			<pose frame=''>2 1 0.25 0 0 0</pose>
